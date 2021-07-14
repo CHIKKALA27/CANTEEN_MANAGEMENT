@@ -373,14 +373,14 @@ int main()
     switch(a)
 	{
     	case 1:
-    		//NewCustomer();
+    		NewCustomer();
 			DisplayList(First);
     		cout<<"\nDO YOU WANT TO PURCHASE(Y/N):";
     		cin>>input;
 			if(input=='Y'||input=='y')
 			{	
 				SelectedItemsList=BuyItems();
-				//Customer(input);
+				Customer(input);
 				BillDisplayList(SelectedItemsList);
 				cout<<"\nThankyou\t\t\tVisit Again"<<endl;
 				cout<<"================================================="<<endl;
