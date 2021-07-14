@@ -1,9 +1,9 @@
-# CANTEEN_MANAGEMENT
+#CANTEEN_MANAGEMENT
 /*
 NAME                                                     : PREM KUMAR CHIKKALA
-ROLL NO                                                  : 19EE10019
-DEPARTMENT                                               : ELECTRICAL ENGINEERING (4 YR)
-PROJECT NAME                                             : CANTEEN MANAGEMENT
+ROLL NO                                                : 19EE10019
+DEPARTMENT                                       : ELECTRICAL ENGINEERING (4 YR)
+PROJECT NAME                                    : CANTEEN MANAGEMENT
 */
 #include<iostream>
 #include<string.h>
@@ -17,7 +17,7 @@ struct Item
 	int ItemPrice;
 	int ItemCount;
 	struct Item *next;
-}*First=NULL,*Primary=NULL,*Temp=NULL,*SelectedItemsList=NULL,*Last=NULL,*Temp1=NULL;
+}*First=NULL,*Primary=NULL,*Temp=NULL,*Last=NULL;
 
 void NewCustomer()
 {
@@ -78,7 +78,6 @@ void CreatListBySelf()
 	First->ItemPrice=10;
 	First->next=NULL;
 	Last=First;
-	Primary=First;
 	
 	Temp=new Item;
 	Temp->id=2;
@@ -178,6 +177,7 @@ void DisplayList(struct Item *DisplayItem)
 		cout<<"Item Id:"<<DisplayItem->id<<endl;
 		cout<<"Item Name:"<<DisplayItem->ItemName<<endl;
 		cout<<"Item Cost:"<<DisplayItem->ItemPrice<<"/-"<<endl;
+		cout<<"Item Count:"<<DisplayItem->ItemCount<<endl;
 		cout<<endl;
 		DisplayItem=DisplayItem->next;
 	}
@@ -220,30 +220,26 @@ struct Item *SearchInList(struct Item *SearchList,int id2)
 
 int AppendList(char name1[100],int count1,int price1)
 {	
-	Temp1=new Item;
+	Temp=new Item;
 	struct Item *Secondary=NULL;
-	struct Item *Third=NULL;
-	Temp1->id=ID1++;
-	strcpy(Temp1->ItemName,name1);
+	Temp->id=ID1++;
+	strcpy(Temp->ItemName,name1);
 	Secondary=First;
-	Secondary=Secondary->next;
-	Third=First;
 	while(Secondary!=NULL)
 	{
-		if(name1==Third->ItemName)
+		if(name1==Secondary->ItemName)
 		{
 		
 			ID1--;
 			return 0;
 		}
 		Secondary=Secondary->next;
-		Third=Third->next;
 	}
-	Temp1->ItemCount=count1;
-	Temp1->ItemPrice=price1;
-	Temp1->next=NULL;
-	Last->next=Temp1;
-	Last=Temp1;
+	Temp->ItemCount=count1;
+	Temp->ItemPrice=price1;
+	Temp->next=NULL;
+	Last->next=Temp;
+	Last=Temp;
 	return 1;	
 }
 
@@ -252,13 +248,18 @@ struct Item *BuyItems()
 	unsigned int Quantity;
 	int id1,i=0;
 	char LocalChoice;
-	struct Item *SelectedItemsListTemp;
-	struct Item *SelectedItems;
+	struct Item *SelectedItemsListTemp=NULL,*SelectedItems=NULL,*SelectedItemsList=NULL,*Primary1=NULL;
+	Primary=First;
 	SelectedItems=new Item;
 	cout<<"\nEnter the Id of your selected item:";
 	cin>>id1;
 	ID[i++]=id1;
-	SelectedItems=SearchInList(First,id1);
+	Primary1=SearchInList(Primary,id1);
+	SelectedItems->id=Primary1->id;
+	SelectedItems->ItemCount=Primary1->ItemCount;
+	strcpy(SelectedItems->ItemName,Primary1->ItemName);
+	SelectedItems->ItemPrice=Primary1->ItemPrice;
+	SelectedItems->next=NULL;
 	if(SelectedItems!=NULL)
 	{
 		
@@ -266,7 +267,8 @@ struct Item *BuyItems()
 		cin>>Quantity;
 		if(Quantity<=SelectedItems->ItemCount)
 		{
-			SelectedItems->ItemCount=Quantity;	
+			Primary1->ItemCount=SelectedItems->ItemCount-Quantity;
+			SelectedItems->ItemCount=Quantity;
 			SelectedItems->next=NULL;
 			SelectedItemsList=SelectedItems;
 			SelectedItemsListTemp=SelectedItems;	
@@ -284,39 +286,45 @@ struct Item *BuyItems()
 			cin>>LocalChoice;
 			if (LocalChoice=='Y'||LocalChoice=='y')
 			{
-				CreatListBySelf();
+				Primary=First;
 				cout<<"\nEnter the Id of your selected item:";
 				cin>>id1;
 				ID[i++]=id1;
 				if(IDstore(ID,id1,i)==0)
 				{
-				SelectedItems=new Item;
-				SelectedItems=SearchInList(First,id1);
-				if(SelectedItems!=NULL)
-				{
-					cout<<"\nEnter the quantity of the selected item:";
-					cin>>Quantity;
-					if(Quantity<SelectedItems->ItemCount)
+					SelectedItems=new Item;
+					Primary1=SearchInList(Primary,id1);
+					SelectedItems->id=Primary1->id;
+					SelectedItems->ItemCount=Primary1->ItemCount;
+					strcpy(SelectedItems->ItemName,Primary1->ItemName);
+					SelectedItems->ItemPrice=Primary1->ItemPrice;
+					SelectedItems->next=NULL;
+					if(SelectedItems!=NULL)
 					{
-						SelectedItems->ItemCount=Quantity;
-						if(SelectedItemsList==NULL)
+						cout<<"\nEnter the quantity of the selected item:";
+						cin>>Quantity;
+						if(Quantity<=SelectedItems->ItemCount)
 						{
-							SelectedItemsList=SelectedItems;
+							Primary1->ItemCount=SelectedItems->ItemCount-Quantity;
+							SelectedItems->ItemCount=Quantity;
+							if(SelectedItemsList==NULL)
+							{
+								SelectedItemsList=SelectedItems;
+								SelectedItemsListTemp=SelectedItems;	
+							}
+							SelectedItemsListTemp->next=SelectedItems;
+							SelectedItemsListTemp=SelectedItems;
+							SelectedItemsListTemp->next=NULL;
+							goto function;
 						}
-						SelectedItemsListTemp->next=SelectedItems;
-						SelectedItemsListTemp=SelectedItems;
-						SelectedItemsListTemp->next=NULL;
-						goto function;
+						else
+						{
+							cout<<"\nSorry , the quantity of the item you selected is OUT OF STOCK"<<endl;
+							cout<<"\nAvailable quantity:"<<SelectedItems->ItemCount;
+							i--;
+							goto function;
+						}
 					}
-					else
-					{
-						cout<<"\nSorry , the quantity of the item you selected is OUT OF STOCK"<<endl;
-						cout<<"\nAvailable quantity:"<<SelectedItems->ItemCount;
-						i--;
-						goto function;
-					}
-				
-				}
 				else
 				{
 					cout<<"\nItem Not found\nPlease Enter a valid id"<<endl;	
@@ -347,12 +355,14 @@ struct Item *BuyItems()
 
 int main()
  {
+	struct Item *SelectedItemsList=NULL;
 	unsigned int a,price1,count1;
 	int g;
 	char input,name1[100];
 	CreatListBySelf();
-	cout<<"\t\t\t\tINSTITUTE CANTEEN MANAGEMENT\n";
-   	start:;
+	start:;
+	{
+   	cout<<"\t\t\t\tINSTITUTE CANTEEN MANAGEMENT\n";
 	cout<<"\n1.NEW CUSTOMER/MENU & PURCHASE"<<endl;
 	cout<<"2.QUANTITY AVAILABLE/DISPLAY MENU"<<endl;
 	cout<<"3.ADD ITEM TO THE EXISTING MENU"<<endl;
@@ -363,19 +373,20 @@ int main()
     switch(a)
 	{
     	case 1:
-    		NewCustomer();
+    		//NewCustomer();
 			DisplayList(First);
     		cout<<"\nDO YOU WANT TO PURCHASE(Y/N):";
     		cin>>input;
 			if(input=='Y'||input=='y')
 			{	
 				SelectedItemsList=BuyItems();
-				Customer(input);
+				//Customer(input);
 				BillDisplayList(SelectedItemsList);
 				cout<<"\nThankyou\t\t\tVisit Again"<<endl;
 				cout<<"================================================="<<endl;
 			}
 			cout<<"\n"<<endl;
+			goto start;
 			break;
 		case 2:
 			DisplayList(First);
@@ -410,5 +421,6 @@ int main()
 			cout<<"\nEntered a wrong choice\nPlease select an existing choice:"<<endl;
 			goto start;;	
  	}
+ 	}	
 	return 0;
 }
